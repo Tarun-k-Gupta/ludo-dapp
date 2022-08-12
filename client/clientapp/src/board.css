@@ -1,0 +1,393 @@
+/* * {
+    padding: 0;
+    margin: 0;
+} */
+
+.title{
+    color: gold;
+    font-family:cursive;
+    font-size:xx-large;
+    margin-top: 10%;
+    text-align: center;
+  }
+  
+  .game{
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66%; 
+      grid-template-rows: 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66% 6.66%; 
+      max-width: 450px;
+      
+  }
+  
+  .player1home{
+      background-color: red;
+      grid-row-start: 1;
+      grid-row-end: 7;
+      grid-column-start: 1;
+      grid-column-end: 7;
+      border: 1px solid;
+  }
+  
+  .player1way{
+    background-color: red;
+    border: 1px solid;
+    grid-row-start: 8;
+    grid-row-end: 9;
+    grid-column-start: 2;
+    grid-column-end: 7;
+  }
+  
+  .player2home{
+      background-color: green;
+      grid-row-start: 1;
+      grid-row-end: 7;
+      grid-column-start: 10;
+      grid-column-end: 16;
+      border: 1px solid;
+  
+  }
+  
+  .player2way{
+    background-color: green;
+    border: 1px solid;
+    grid-row-start: 2;
+    grid-row-end: 7;
+    grid-column-start: 8;
+    grid-column-end: 9;
+  }
+  
+  .player3home{
+      background-color: blue;
+      grid-row-start: 10;
+      grid-row-end: 16;
+      grid-column-start: 1;
+      grid-column-end: 7;
+      border: 1px solid;
+  }
+  
+  .player3way{
+    background-color: blue;
+    border: 1px solid;
+    grid-row-start: 10;
+    grid-row-end: 15;
+    grid-column-start: 8;
+    grid-column-end: 9;
+  }
+  
+  .player4home{
+      background-color: yellow;
+      grid-row-start: 10;
+      grid-row-end: 16;
+      grid-column-start: 10;
+      grid-column-end: 16;
+      border: 1px solid;
+  }
+  
+  .player4way{
+    display: grid;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    background-color: yellow;
+    border: 1px solid;
+    grid-row-start: 8;
+    grid-row-end: 9;
+    grid-column-start: 10;
+    grid-column-end: 15;
+  }
+  
+  .destination{
+      grid-row-start: 7;
+      grid-column-start: 7;
+      grid-row-end: 10;
+      grid-column-end: 10;
+      text-align: center;
+      background-image: url('bg.jpeg');
+      border: 1px solid;
+  }
+  
+  .cell{
+      background-color: white;
+      min-width: 30px;
+      min-height: 30px;
+      border: 1px solid;
+  }
+  
+  .cell11{
+    grid-row-start: 2;
+    grid-column-start: 2;
+    grid-row-end: 3;
+    grid-column-end: 3;
+    border: 1px solid;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background-color: red;
+  }
+  
+  .cell12{
+    grid-row-start: 2;
+    grid-column-start: 5;
+    grid-row-end: 3;
+    grid-column-end: 6;
+    border: 1px solid;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background-color: red;
+  }
+  
+  .cell13{
+    grid-row-start: 5;
+    grid-column-start: 2;
+    grid-row-end: 6;
+    grid-column-end: 3;
+    border: 1px solid;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background-color: red;
+  }
+  
+  .cell14{
+    grid-row-start: 5;
+    grid-column-start: 5;
+    grid-row-end: 6;
+    grid-column-end: 6;
+    border: 1px solid;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background-color: red;
+  }
+  
+  .cell21{
+    grid-row-start: 2;
+    grid-column-start: 11;
+    grid-row-end: 3;
+    grid-column-end: 12;
+    border: 1px solid;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background-color: white;
+  }
+  
+  .cell22{
+    grid-row-start: 2;
+    grid-column-start: 14;
+    grid-row-end: 3;
+    grid-column-end: 15;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: 1px solid;
+    background-color: white;
+  }
+  
+  .cell23{
+    grid-row-start: 5;
+    grid-column-start: 11;
+    grid-row-end: 6;
+    grid-column-end: 12;
+    border: 1px solid;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background-color: white;
+  }
+  
+  .cell24{
+    grid-row-start: 5;
+    grid-column-start: 14;
+    grid-row-end: 6;
+    grid-column-end: 15;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: 1px solid;
+    background-color: white;
+  }
+  
+  .cell31{
+    grid-row-start: 11;
+    grid-column-start: 2;
+    grid-row-end: 12;
+    grid-column-end: 3;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: 1px solid;
+    background-color: white;
+  
+  }
+  
+  .cell32{
+    grid-row-start: 11;
+    grid-column-start: 5;
+    grid-row-end: 12;
+    grid-column-end: 6;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: 1px solid;
+    background-color: white;
+  
+  }
+  
+  .cell33{
+    grid-row-start: 14;
+    grid-column-start: 2;
+    grid-row-end: 15;
+    grid-column-end: 3;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: 1px solid;
+    background-color: white;
+  
+  }
+  
+  .cell34{
+    grid-row-start: 14;
+    grid-column-start: 5;
+    grid-row-end: 15;
+    grid-column-end: 6;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: 1px solid;
+    background-color: white;
+  
+  }
+  
+  .cell41{
+    grid-row-start: 11;
+    grid-column-start: 11;
+    grid-row-end: 12;
+    grid-column-end: 12;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: 1px solid;
+    background-color: white;
+  
+  }
+  
+  .cell42{
+    grid-row-start: 11;
+    grid-column-start: 14;
+    grid-row-end: 12;
+    grid-column-end: 15;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: 1px solid;
+    background-color: white;
+  
+  }
+  
+  .cell43{
+    grid-row-start: 14;
+    grid-column-start: 11;
+    grid-row-end: 15;
+    grid-column-end: 12;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: 1px solid;
+    background-color: white;
+  
+  }
+  
+  .cell44{
+    grid-row-start: 14;
+    grid-column-start: 14;
+    grid-row-end: 15;
+    grid-column-end: 15;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    border: 1px solid;
+    background-color: white;
+  
+  }
+  
+  
+  
+  .background {
+    background-color: skyblue;
+      height: 100vh;
+      padding-top: 1px;
+  }
+  
+  .button {
+      background-color: darkblue; /* Green */
+      border: none;
+      color: white;
+      padding: 16px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      transition-duration: 0.4s;
+      cursor: pointer;  
+  }
+  
+  .rollbutton {
+    background-color: white; 
+    color: black; 
+    border: 2px solid darkblue;
+    width: 70px;
+    height: 40px;
+    position: absolute;
+    right: 200px;
+    bottom:150px;
+  }
+  
+  .rollbutton:hover {
+    background-color: darkblue;
+    color: white;
+    cursor:pointer;
+  }
+  
+  .start {
+    display: inline-block;
+    padding: 15px 25px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    outline: none;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px #999;
+    position: absolute;
+    left: 1055px;
+    bottom: 150px;
+  }
+  
+  .start:hover {background-color: #3e8e41}
+  
+  .start:active {
+    background-color: #3e8e41;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+  }
+  
+  .choice{
+    display: grid;
+    background-color: white;
+    width: 100px;
+    height: 100px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    position: absolute;
+    right:185px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: xx-large;
+    bottom:200px
+  }
+  
