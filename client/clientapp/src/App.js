@@ -815,7 +815,7 @@ function App() {
 
 
   function play(num) {
-    document.getElementById("coin11").onclick = function () { if (players[1] && !player11pos[3]) { play1(num, "coin11", player11pos); sendInfo(player11pos, player12pos, player13pos, player14pos, player21pos, player22pos, player23pos, player24pos, player31pos, player32pos, player33pos, player34pos, player41pos, player42pos, player43pos, player44pos, room)} };
+    document.getElementById("coin11").onclick = function () { if (players[1] && !player11pos[3]) { play1(num, "coin11", player11pos); sendInfo(player11pos, player12pos, player13pos, player14pos, player21pos, player22pos, player23pos, player24pos, player31pos, player32pos, player33pos, player34pos, player41pos, player42pos, player43pos, player44pos, room) } };
     document.getElementById("coin12").onclick = function () { if (players[1] && !player12pos[3]) { play1(num, "coin12", player12pos); sendInfo(player11pos, player12pos, player13pos, player14pos, player21pos, player22pos, player23pos, player24pos, player31pos, player32pos, player33pos, player34pos, player41pos, player42pos, player43pos, player44pos, room) } };
     document.getElementById("coin13").onclick = function () { if (players[1] && !player13pos[3]) { play1(num, "coin13", player13pos); sendInfo(player11pos, player12pos, player13pos, player14pos, player21pos, player22pos, player23pos, player24pos, player31pos, player32pos, player33pos, player34pos, player41pos, player42pos, player43pos, player44pos, room) } };
     document.getElementById("coin14").onclick = function () { if (players[1] && !player14pos[3]) { play1(num, "coin14", player14pos); sendInfo(player11pos, player12pos, player13pos, player14pos, player21pos, player22pos, player23pos, player24pos, player31pos, player32pos, player33pos, player34pos, player41pos, player42pos, player43pos, player44pos, room) } };
@@ -856,7 +856,7 @@ function App() {
 
   const [currentAccount, setCurrentAccount] = useState("");
   const [userCoins, setUserCoins] = useState(0);
-  const [board, setBoard] = useState(false);
+  // const [board, setBoard] = useState(false);
   const [room, setRoom] = useState("");
   const [roomJoined, setroomJoined] = useState(false);
   const [gameStartData, setGameStartData] = useState(
@@ -872,7 +872,6 @@ function App() {
     if (room !== "") {
       socket.emit("join_room", room);
       setroomJoined(true);
-      setBoard(false);
     }
   };
 
@@ -883,7 +882,7 @@ function App() {
 
   useEffect(() => {
 
-    socket.on("receiveBoard", (p11pos, p12pos, p13pos, p14pos, p21pos, p22pos, p23pos, p24pos, p31pos, p32pos, p33pos, p34pos, p41pos, p42pos, p43pos, p44pos, ) => {
+    socket.on("receiveBoard", (p11pos, p12pos, p13pos, p14pos, p21pos, p22pos, p23pos, p24pos, p31pos, p32pos, p33pos, p34pos, p41pos, p42pos, p43pos, p44pos,) => {
       console.log("Listening receive board...");
       player11pos = p11pos;
       player12pos = p12pos;
@@ -980,8 +979,8 @@ function App() {
       const provider = new ethers.providers.Web3Provider(ethereum);
       const signer = provider.getSigner();
       const ludoContract = new ethers.Contract(contractAddress, contractABI, signer);
-      await ludoContract.newAccount("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
-      let userCoins = await ludoContract.getCoins("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
+      await ludoContract.signUp();
+      let userCoins = await ludoContract.getBalance("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
       setUserCoins(userCoins.toNumber());
       console.log("coins:", userCoins.toNumber());
     } catch (error) {
@@ -995,34 +994,41 @@ function App() {
   }
 
   const func = () => {
-    setBoard(false);
   }
 
 
   const startGame = async (e) => {
-    setBoard(true);
-    // e.preventDefault();
-    // console.log("start clicked");
-    // try {
-    //   const { ethereum } = window;
-    //   if (ethereum) {
-    //     const provider = new ethers.providers.Web3Provider(ethereum);
-    //     const signer = provider.getSigner();
-    //     const ludoContract = new
-    //     ethers.Contract(contractAddress, contractABI, signer);
 
-    //     let staked = await ludoContract.stakeCoins("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", gameStartData.coins);
-    //       let userCoins = await ludoContract.getCoins("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
-    //   setUserCoins(userCoins.toNumber());
-    //   console.log("coins:", userCoins.toNumber());
-    //   searchPlayers();
-    //   } else {
-    //     console.log("Ethereum object doesn't exist!")
-    //   }
-    // } catch (error) {
-    //   console.log("eeerrrrrror")
-    //   alert("not enough coins")
-    // }
+    e.preventDefault();
+    console.log("start clicked");
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const ludoContract = new
+          ethers.Contract(contractAddress, contractABI, signer);
+        if (room == "") {
+          alert("Please enter room number");
+          return;
+        };
+
+        let staked = await ludoContract.startGame("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", gameStartData.coins);
+        let userCoins = await ludoContract.getBalance("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
+        setUserCoins(userCoins.toNumber());
+        console.log("coins:", userCoins.toNumber());
+
+        //add condition: players should not be more than 4 in any room
+        socket.emit("join_room", room);
+        setroomJoined(true);
+
+      } else {
+        console.log("Ethereum object doesn't exist!")
+      }
+    } catch (error) {
+      console.log("error")
+      alert("Not enough coins")
+    }
   }
 
   const handleChange = (e) => {
@@ -1036,20 +1042,20 @@ function App() {
   const updateCoins = () => {
 
   }
-  if (board) {
-    return (
-      <div>
-        <h3>Enter room code</h3>
-        <input placeholder="Room Number..." onChange={(event) => {
-          setRoom(event.target.value);
-        }}
-        />
-        <button className="joinButton" onClick={joinRoom}>Join room</button>
-        {console.log(roomJoined)}
-      </div>
+  // if (board) {
+  //   return (
+  //     <div>
+  //       <h3>Enter room code</h3>
+  //       <input placeholder="Room Number..." onChange={(event) => {
+  //         setRoom(event.target.value);
+  //       }}
+  //       />
+  //       <button className="joinButton" onClick={joinRoom}>Join room</button>
+  //       {console.log(roomJoined)}
+  //     </div>
 
-    )
-  }
+  //   )
+  // }
   if (roomJoined) {
     return (
       <div>
@@ -1181,11 +1187,19 @@ function App() {
               <option value="5000">5000</option>
               <option value="10000">10000</option>
             </select>
+            <h3>Enter room code</h3>
+            <input placeholder="Room Number..." onChange={(event) => {
+              setRoom(event.target.value);
+            }}
+            />
             <button className="buttonApp" onClick={startGame}>Start game</button>
+
           </form>
+
         </div>
 
       </div>
+
     </div>
   );
 }
