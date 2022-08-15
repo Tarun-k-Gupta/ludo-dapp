@@ -6,6 +6,9 @@ const {Server} = require("socket.io");
 const cors = require("cors");
 app.use(cors());
 
+const map = new Map();
+
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -19,7 +22,23 @@ const io = new Server(server, {
     console.log(`User Connected: ${socket.id}`);
   
     socket.on("join_room", (room_code) => {
-      socket.join(room_code);
+      if(map.get(room_code) == undefined){
+        console.log("x");
+        map.set(room_code, 1);
+        socket.emit("join_success");
+      }
+    
+      else{
+        let j = map.get(room_code);
+        if(j < 4){
+          map.set(room_code, j + 1);
+          socket.join(room_code);
+          socket.emit("join_success");
+        }
+        else{
+          socket.emit("join_error");
+        }
+      }
     });
   
     socket.on("send_message", (data) => {

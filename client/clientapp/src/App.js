@@ -1013,14 +1013,19 @@ function App() {
           return;
         };
 
-        let staked = await ludoContract.startGame("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", gameStartData.coins);
-        let userCoins = await ludoContract.getBalance("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
-        setUserCoins(userCoins.toNumber());
-        console.log("coins:", userCoins.toNumber());
+        // let staked = await ludoContract.startGame("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", gameStartData.coins);
+        // let userCoins = await ludoContract.getBalance("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
+        // setUserCoins(userCoins.toNumber());
+        // console.log("coins:", userCoins.toNumber());
 
         //add condition: players should not be more than 4 in any room
         socket.emit("join_room", room);
-        setroomJoined(true);
+        socket.on("join_error", () => {
+            setroomJoined(false);
+        });
+        socket.on("join_success", () => {
+          setroomJoined(true);
+        });
 
       } else {
         console.log("Ethereum object doesn't exist!")
