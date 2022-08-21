@@ -844,83 +844,99 @@ function App() {
             <h1>Ludo</h1>
           </section>
           <section class="game">
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="player2home"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="destination"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="player3home"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="player4home"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell"></div>
-            <div class="cell" id="deleter"></div>
-            <div class="player1home"></div>
-            <div class="cell11" id="coin11">1</div>
-            <div class="cell12" id="coin12">2</div>
-            <div class="cell13" id="coin13">3</div>
-            <div class="cell14" id="coin14">4</div>
-            <div class="cell21" id="coin21">1</div>
-            <div class="cell22" id="coin22">2</div>
-            <div class="cell23" id="coin23">3</div>
-            <div class="cell24" id="coin24">4</div>
-            <div class="cell31" id="coin31">1</div>
-            <div class="cell32" id="coin32">2</div>
-            <div class="cell33" id="coin33">3</div>
-            <div class="cell34" id="coin34">4</div>
-            <div class="cell41" id="coin41">1</div>
-            <div class="cell42" id="coin42">2</div>
-            <div class="cell43" id="coin43">3</div>
-            <div class="cell44" id="coin44">4</div>
-            <div class="player1way"></div>
-            <div class="player2way"></div>
-            <div class="player3way"></div>
-            <div class="player4way"></div>
+          <div class="cell" id="cell17"></div>
+                <div class="cell" id="cell18"></div>
+                <div class="cell" id="cell19"></div>
+                <div class="cell" id="cell27"></div>
+                <div class="cell" id="cell29"></div>
+                <div class="cell" id="cell37"></div>
+                <div class="cell" id="cell39"></div>
+                <div class="cell" id="cell47"></div>
+                <div class="cell" id="cell49"></div>
+                <div class="cell" id="cell57"></div>
+                <div class="cell" id="cell59"></div>
+                <div class="cell" id="cell67"></div>
+                <div class="cell" id="cell69"></div>
+                <div class="cell" id="cell71"></div>
+                <div class="cell" id="cell72"></div>
+                <div class="cell" id="cell73"></div>
+                <div class="cell" id="cell74"></div>
+                <div class="cell" id="cell75"></div>
+                <div class="cell" id="cell76"></div>
+                <div class="cell" id="cell710"></div>
+                <div class="cell" id="cell711"></div>
+                <div class="cell" id="cell712"></div>
+                <div class="cell" id="cell713"></div>
+                <div class="cell" id="cell714"></div>
+                <div class="cell" id="cell715"></div>
+                <div class="cell" id="cell81"></div>
+                <div class="cell" id="cell815"></div>
+                <div class="cell" id="cell91"></div>
+                <div class="cell" id="cell92"></div>
+                <div class="cell" id="cell93"></div>
+                <div class="cell" id="cell94"></div>
+                <div class="cell" id="cell95"></div>
+                <div class="cell" id="cell96"></div>
+                <div class="cell" id="cell910"></div>
+                <div class="cell" id="cell911"></div>
+                <div class="cell" id="cell912"></div>
+                <div class="cell" id="cell913"></div>
+                <div class="cell" id="cell914"></div>
+                <div class="cell" id="cell915"></div>
+                <div class="cell" id="cell107"></div>
+                <div class="cell" id="cell109"></div>
+                <div class="cell" id="cell117"></div>
+                <div class="cell" id="cell119"></div>
+                <div class="cell" id="cell127"></div>
+                <div class="cell" id="cell129"></div>
+                <div class="cell" id="cell137"></div>
+                <div class="cell" id="cell139"></div>
+                <div class="cell" id="cell147"></div>
+                <div class="cell" id="cell149"></div>
+                <div class="cell" id="cell157"></div>
+                <div class="cell" id="cell158"></div>
+                <div class="cell" id="cell159"></div>
+                <div class="player1home"></div>
+                <div class="player2home"></div>
+                <div class="player3home"></div>
+                <div class="player4home"></div>
+                <div class="cell11" id="coin11">1</div>
+                <div class="cell12" id="coin12">2</div>
+                <div class="cell13" id="coin13">3</div>
+                <div class="cell14" id="coin14">4</div>
+                <div class="cell21" id="coin21">1</div>
+                <div class="cell22" id="coin22">2</div>
+                <div class="cell23" id="coin23">3</div>
+                <div class="cell24" id="coin24">4</div>
+                <div class="cell31" id="coin31">1</div>
+                <div class="cell32" id="coin32">2</div>
+                <div class="cell33" id="coin33">3</div>
+                <div class="cell34" id="coin34">4</div>
+                <div class="cell41" id="coin41">1</div>
+                <div class="cell42" id="coin42">2</div>
+                <div class="cell43" id="coin43">3</div>
+                <div class="cell44" id="coin44">4</div>
+                <div class="destination"></div>
+                <div class="way12" id="cell82"></div>
+                <div class="way13" id="cell83"></div>
+                <div class="way14" id="cell84"></div>
+                <div class="way15" id="cell85"></div>
+                <div class="way16" id="cell86"></div>
+                <div class="way22" id="cell28"></div>
+                <div class="way23" id="cell38"></div>
+                <div class="way24" id="cell48"></div>
+                <div class="way25" id="cell58"></div>
+                <div class="way26" id="cell68"></div>
+                <div class="way32" id="cell814"></div>
+                <div class="way33" id="cell813"></div>
+                <div class="way34" id="cell812"></div>
+                <div class="way35" id="cell811"></div>
+                <div class="way36" id="cell810"></div>
+                <div class="way42" id="cell148"></div>
+                <div class="way43" id="cell138"></div>
+                <div class="way44" id="cell128"></div>
+                <div class="way45" id="cell118"></div>
+                <div class="way46" id="cell108"></div>
 
           </section>
 
