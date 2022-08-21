@@ -46,23 +46,23 @@ const io = new Server(server, {
     })
 
     socket.on("fromHome", (id, color, coin, colour, room) => {
-      socket.to(room).emit("s_fromHome"(id, color, coin, colour))
+      socket.to(room).emit("s_fromHome", id, color, coin, colour)
     })  
 
     socket.on("setNull", (row, col, room) => {
-      socket.to(room).emit("s_setNull"(row, col))
+      socket.to(room).emit("s_setNull", row, col)
     })  
 
     socket.on("pos2", (pos_0, pos_1, colour, coin, room) => {
-      socket.to(room).emit("s_pos2", (pos_0, pos_1, colour, coin))
+      socket.to(room).emit("s_pos2", pos_0, pos_1, colour, coin)
     }) 
 
     socket.on("pos3", (coinId, room) => {
-      socket.to(room).emit("s_pos3", (coinId))
+      socket.to(room).emit("s_pos3", coinId)
     })  
 
     socket.on("Notpos3", (pos_0, pos_1, colour, coin, room) => {
-      socket.to(room).emit("s_Notpos3", (pos_0, pos_1, colour, coin))
+      socket.to(room).emit("s_Notpos3", pos_0, pos_1, colour, coin)
     })  
   });
   
