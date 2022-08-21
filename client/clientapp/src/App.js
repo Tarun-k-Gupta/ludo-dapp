@@ -9,7 +9,8 @@ const socket = io.connect("http://localhost:3001");
 
 function App() {
   const [diceUrl, setDiceUrl] = useState("")
-  let dice = ['./one.png', './two.png', './three.png', './four.png', './five.png', './six.png']
+
+  let dice = ['./one.jpeg', './two.jpeg', './three.jpeg', './four.jpeg', './five.jpeg', './six.jpeg']
 
   let players = [0, 0, 0, 0, 0]; //players[0] = 1 if game is over
   let player = 0;
@@ -47,7 +48,7 @@ function App() {
     return str;
   }
 
-  function sendHome(coin, id) {
+  function setHome(coin, id) {
     if (coin == 1) {
       if (id == "1") player11pos = [0, 0, 0, 0];
       else if (id == "2") player12pos = [0, 0, 0, 0];
@@ -75,7 +76,19 @@ function App() {
 
   }
 
-  function checkBox(box) {
+  function sendHome(row, col) {
+    let coin, id, color;
+    coin = colorOfBox(row, col);
+    let cell = document.getElementById("cell" + row.toString() + col.toString());
+    id = cell.innerHTML;
+    color = cell.style.backgroundColor;
+    setHome(coin, id.toString());
+    let coin_id = "coin" + coin.toString() + id.toString();
+    document.getElementById(coin_id).style.backgroundColor = color;
+  }
+
+  function colorOfBox(row, col) {
+    var box = row.toString() + col.toString();
     var id = "cell" + box;
     var box = document.getElementById(id);
     if ((box.style.backgroundColor == "") || (box.style.backgroundColor == "white")) return 0;
@@ -85,98 +98,173 @@ function App() {
     else if (box.style.backgroundColor == "blue") return 4;
   }
 
+  function replaceBox(pos, color) {
+    if (pos[3] != 0) return 1;
+    if (colorOfBox(pos[0], pos[1]) == 0) {
+      return 1; //can be replaced/updated
+    }
+
+    if (colorOfBox(pos[0], pos[1]) == color) {
+      console.log("hi");
+      return 0; //cannot be replaced.
+    }
+    else {
+      if (colorOfBox(pos[0], pos[1]) == 1) {
+        if ((pos[0] == 7) && (pos[1] == 2)) {
+          return 0; //as it is in safe point..can't be replaced; 
+        }
+        else {
+          sendHome(pos[0], pos[1]);
+          return 1;
+        }
+      }
+      else if (colorOfBox(pos[0], pos[1]) == 2) {
+        if ((pos[0] == 2) && (pos[1] == 9)) {
+          return 0; //as it is in safe point..can't be replaced; 
+        }
+        else {
+          sendHome(pos[0], pos[1]);
+          return 1;
+        }
+      }
+      else if (colorOfBox(pos[0], pos[1]) == 3) {
+        if ((pos[0] == 9) && (pos[1] == 14)) {
+          return 0; //as it is in safe point..can't be replaced; 
+        }
+        else {
+          sendHome(pos[0], pos[1]);
+          return 1;
+        }
+      }
+      else if (colorOfBox(pos[0], pos[1]) == 4) {
+        if ((pos[0] == 14) && (pos[1] == 7)) {
+          return 0; //as it is in safe point..can't be replaced; 
+        }
+        else {
+          sendHome(pos[0], pos[1]);
+          return 1;
+        }
+      }
+    }
+
+  }
+
+  function updateBox(row, col, safety, pos, fromHome, color, coin) {
+    let colour;
+    if (color == 1) colour = "red";
+    else if (color == 2) colour = "green";
+    else if (color == 3) colour = "yellow";
+    else if (color == 4) colour = "blue";
+
+    if (!replaceBox(pos, color)) {
+      pos[0] = row; pos[1] = col; pos[2] = safety;
+      return 0;
+    }
+    else {
+      if (fromHome) {
+        let id = getID(pos[0], pos[1]);
+        document.getElementById(id).style.backgroundColor = colour;
+        document.getElementById(id).innerHTML = coin;
+        document.getElementById("coin" + color.toString() + coin.toString()).style.backgroundColor = "white";
+        socket.emit("fromHome", id, color, coin, colour, room);
+      }
+      else {
+        document.getElementById(getID(row, col)).style.backgroundColor = "";
+        document.getElementById(getID(row, col)).innerHTML = "";
+        socket.emit("setNull", row, col, room);
+
+        if (pos[2] == 0) //not in safe lines
+        {
+          document.getElementById(getID(pos[0], pos[1])).style.backgroundColor = colour;
+          document.getElementById(getID(pos[0], pos[1])).innerHTML = coin;
+          socket.emit("pos2", pos[0], pos[1], colour, coin, room);
+        }
+        else {
+          if (pos[3] == 1) {
+            let coinId = "coin" + color.toString() + coin.toString();
+            document.getElementById(coinId).style.backgroundColor = "lightgreen";
+            pos[0] = 0; pos[1] = 0;
+            socket.emit("pos3", coinId, room);
+          }
+          else {
+            document.getElementById(getID(pos[0], pos[1])).style.backgroundColor = colour;
+            document.getElementById(getID(pos[0], pos[1])).innerHTML = coin;
+            socket.emit("Notpos3", pos[0], pos[1], colour, coin, room);        
+          }
+        }
+      }
+      return 1;
+    }
+  }
+
   function move(pos, num) {
-    let locations = [];
     while (num > 0) {
       if (pos[0] == 7) {
         while ((pos[1] <= 6) && (num > 0)) {
           pos[1]++; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
         if (pos[1] == 7) {
           pos[0]--;
-          locations.pop(); locations.push("67");
         }
         while ((10 <= pos[1]) && (pos[1] <= 14) && (num > 0)) {
           pos[1]++; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
       }
 
       if (pos[1] == 7) {
         while ((1 < pos[0]) && (pos[0] <= 6) && (num > 0)) {
           pos[0]--; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
         while ((10 <= pos[0]) && (pos[0] <= 15) && (num > 0)) {
           pos[0]--; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
-        if (pos[0] == 9) {
-          pos[1]--;
-          locations.pop(); locations.push("96");
-        }
+        if (pos[0] == 9) pos[1]--;
       }
 
       if (pos[0] == 1) {
         while ((7 <= pos[1]) && (pos[1] < 9) && (num > 0)) {
           pos[1]++; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
       }
 
       if (pos[1] == 9) {
         while ((pos[0] <= 6) && (num > 0)) {
           pos[0]++; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
-        if (pos[0] == 7) {
-          pos[1]++;
-          locations.pop(); locations.push("710");
-        }
+        if (pos[0] == 7) pos[1]++;
         while ((10 <= pos[0]) && (pos[0] < 15) && (num > 0)) {
           pos[0]++; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
       }
 
       if (pos[1] == 15) {
         while ((7 <= pos[0]) && (pos[0] < 9) && (num > 0)) {
           pos[0]++; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
       }
 
       if (pos[0] == 9) {
         while ((1 < pos[1]) && (pos[1] <= 6) && (num > 0)) {
           pos[1]--; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
         while ((10 <= pos[1]) && (pos[1] <= 15) && (num > 0)) {
           pos[1]--; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
-        if (pos[1] == 9) {
-          pos[0]++;
-          locations.pop(); locations.push("109");
-        }
+        if (pos[1] == 9) pos[0]++;
       }
 
       if (pos[0] == 15) {
         while ((7 < pos[1]) && (pos[1] <= 9) && (num > 0)) {
           pos[1]--; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
       }
 
       if (pos[1] == 1) {
         while ((7 < pos[0]) && (pos[0] <= 9) && (num > 0)) {
           pos[0]--; num--;
-          locations.push(pos[0].toString() + pos[1].toString())
         }
       }
     }
-    return locations;
   }
 
   function safemove(pos, num) {
@@ -231,20 +319,21 @@ function App() {
 
 
   function move1(pos, num) {
-    let mayBeSafe = false;
-    let locations;
+    if ((pos[0] == 0) && (pos[1] == 0)) {
+      if (num == 6) num = 1;
+      else return;
+      pos[0] = 7; pos[1] = 2;
+      num--;
+      return;
+    }
+
     if (!pos[2]) {
       let row = pos[0];
       let col = pos[1];
       let roll = num;
-      if (((pos[0] == 9) && (pos[1] <= 4)) || (pos[1] == 1)) mayBeSafe = true;
-      locations = move(pos, num);
-      if (mayBeSafe) {
+      move(pos, num);
+      if (((row == 9) && (col <= 4)) || (col == 1)) {
         if ((pos[0] <= 7) && (pos[1] >= 2)) {
-          if (pos[0] == 6) locations.pop();
-          while (pos[1] > 2) {
-            locations.pop(); pos[1]--;
-          }
           pos[0] = row;
           pos[1] = col;
           num = roll;
@@ -264,24 +353,24 @@ function App() {
       }
       safemove(pos, num);
     }
-    return locations;
   }
 
   function move2(pos, num) {
-    let mayBeSafe = false;
-    let locations = [];
+    if ((pos[0] == 0) && (pos[1] == 0)) {
+      if (num == 6) num = 1;
+      else return;
+      pos[0] = 2; pos[1] = 9;
+      num--;
+      return;
+    }
+
     if (!pos[2]) {
       let row = pos[0];
       let col = pos[1];
       let roll = num;
-      if (((pos[1] == 7) && (pos[0] <= 4)) || (pos[0] == 1)) mayBeSafe = true;
-      locations = move(pos, num);
-      if (mayBeSafe) {
+      move(pos, num);
+      if (((col == 7) && (row <= 4)) || (row == 1)) {
         if ((pos[1] >= 9) && (pos[0] >= 2)) {
-          if (pos[1] == 9) locations.pop();
-          while (pos[0] > 2) {
-            pos[0]--; locations.pop();
-          }
           pos[0] = row;
           pos[1] = col;
           num = roll;
@@ -301,24 +390,24 @@ function App() {
       }
       safemove(pos, num);
     }
-    return locations;
   }
 
   function move3(pos, num) {
-    let mayBeSafe = false;
-    let locations = [];
+    if ((pos[0] == 0) && (pos[1] == 0)) {
+      if (num == 6) num = 1;
+      else return;
+      pos[0] = 9; pos[1] = 14;
+      num--;
+      return;
+    }
+
     if (!pos[2]) {
       let row = pos[0];
       let col = pos[1];
       let roll = num;
-      if (((pos[0] == 7) && (pos[1] >= 12)) || (pos[1] == 15)) mayBeSafe = true;
-      locations = move(pos, num);
-      if (mayBeSafe) {
+      move(pos, num);
+      if (((row == 7) && (col >= 12)) || (col == 15)) {
         if ((pos[0] >= 9) && (pos[1] <= 14)) {
-          if (pos[0] == 10) locations.pop();
-          while (pos[1] < 14) {
-            locations.pop(); pos[1]++;
-          }
           pos[0] = row;
           pos[1] = col;
           num = roll;
@@ -338,24 +427,24 @@ function App() {
       }
       safemove(pos, num);
     }
-    return locations;
   }
 
   function move4(pos, num) {
-    let mayBeSafe = false;
-    let locations = [];
+    if ((pos[0] == 0) && (pos[1] == 0)) {
+      if (num == 6) num = 1;
+      else return;
+      pos[0] = 14; pos[1] = 7;
+      num--;
+      return;
+    }
+
     if (!pos[2]) {
       let row = pos[0];
       let col = pos[1];
       let roll = num;
-      if (((pos[1] == 9) && (pos[0] >= 12)) || (pos[0] == 15)) mayBeSafe = true;
-      locations = move(pos, num);
-      if (mayBeSafe) {
-        if ((pos[1] <= 7) && (pos[0] >= 14)) {
-          if (pos[1] == 6) locations.pop();
-          while (pos[0] < 14) {
-            pos[0]++; locations.pop();
-          }
+      move(pos, num);
+      if (((col == 9) && (row >= 12)) || (row == 15)) {
+        if ((pos[1] <= 7) && (pos[0] <= 14)) {
           pos[0] = row;
           pos[1] = col;
           num = roll;
@@ -375,13 +464,14 @@ function App() {
       }
       safemove(pos, num);
     }
-    return locations;
   }
 
   function play1(num, coin, pos) {
     let row = pos[0];
     let col = pos[1];
+    let safety = pos[2];
     let fromHome = false;
+    if ((pos[0] == 0) && (pos[1] == 0)) fromHome = true;
 
     let number = 0;
     if (coin == "coin11") number = 1;
@@ -389,112 +479,21 @@ function App() {
     else if (coin == "coin13") number = 3;
     else if (coin == "coin14") number = 4;
 
-    let locations = [];
 
-    if ((pos[0] == 0) && (pos[1] == 0)) {
-      if (num == 6) num = 1;
-      else return;
-      pos[0] = 7;
-      pos[1] = 2;
-      locations.push(pos[0].toString() + pos[1].toString());
-      fromHome = true;
-      document.getElementById(coin).style.backgroundColor = "white";
-      num--;
-    }
+    move1(pos, num); //updates the new position
+    if ((pos[0] == 8) && (pos[1] == 7)) pos[3] = 1;
 
-    else locations = move1(pos, num);
+    //check for same coin meeting
 
-    if (!((pos[0] == 8) && (pos[1] >= 2) && (pos[1] <= 7))) {
-      let n = locations.length;
-      for (let i = 0; i < n; i++) {
-        let st = checkBox(locations[i]);
-        var cell = document.getElementById("cell" + locations[i].toString());
-        if (st == 1) {
-          if (i == n - 1) {
-            pos[0] = row; pos[1] = col;
-            if (fromHome) document.getElementById(coin).style.backgroundColor = "red";
-            return;
-          }
-        }
-        else if (st == 2) {
-          if (locations[i] != "29") {
-            cell.style.backgroundColor = "white";
-            var coinId = "coin2" + cell.innerHTML.toString();
-            document.getElementById(coinId).style.backgroundColor = "green";
-            sendHome(st, cell.innerHTML.toString());
-            cell.innerHTML = "";
-          }
-          else {
-            if (i == n - 1) {
-              pos[0] = row; pos[1] = col;
-              return;
-            }
-          }
-        }
-        else if (st == 3) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin3" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "yellow";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
-        }
-        else if (st == 4) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin4" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "blue";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
-        }
-      }
-
-      var newId = getID(pos[0], pos[1]);
-      var oldId = getID(row, col);
-      var newCell = document.getElementById(newId);
-      var oldCell = document.getElementById(oldId);
-
-      newCell.style.backgroundColor = "red";
-      newCell.innerHTML = number;
-
-      if (!fromHome) {
-        oldCell.style.backgroundColor = "white";
-        oldCell.innerHTML = "";
-      }
-    }
-    else {
-      if (pos[1] == 7) {
-        if (row == 7) {
-          document.getElementById(getID(row, col)).style.backgroundColor = "white";
-          document.getElementById(getID(row, col)).innerHTML = "";
-        }
-        else {
-          let id = "way1" + col.toString();
-          document.getElementById(id).innerHTML = "";
-        }
-        document.getElementById(coin).style.backgroundColor = "lightgreen";
-        pos[0] = 0; pos[1] = 0; pos[3] = 1;
-      }
-      else {
-        if (!((row == 8) && (col >= 2))) {
-          document.getElementById(getID(row, col)).style.backgroundColor = "white";
-          document.getElementById(getID(row, col)).innerHTML = "";
-
-        }
-        else {
-          let id = "way1" + col.toString();
-          document.getElementById(id).innerHTML = "";
-        }
-        let newId = "way1" + pos[1].toString();
-        document.getElementById(newId).innerHTML = number;
-      }
-    }
-
-    players[1] = 0;
+    if (updateBox(row, col, safety, pos, fromHome, 1, number)) players[1] = 0;
   }
 
   function play2(num, coin, pos) {
     let row = pos[0];
     let col = pos[1];
+    let safety = pos[2];
     let fromHome = false;
+    if ((pos[0] == 0) && (pos[1] == 0)) fromHome = true;
 
     let number = 0;
     if (coin == "coin21") number = 1;
@@ -502,107 +501,22 @@ function App() {
     else if (coin == "coin23") number = 3;
     else if (coin == "coin24") number = 4;
 
-    let locations = [];
 
-    if ((pos[0] == 0) && (pos[1] == 0)) {
-      if (num == 6) num = 1;
-      else return;
-      pos[0] = 2;
-      pos[1] = 9;
-      locations.push("29");
-      fromHome = true;
-      document.getElementById(coin).style.backgroundColor = "white";
-      num--;
-    }
+    move2(pos, num); //updates the new position
+    if ((pos[0] == 7) && (pos[1] == 8)) pos[3] = 1;
 
-    else locations = move2(pos, num);
+    //check for same coin meeting
 
-    if (!((pos[1] == 8) && (pos[0] >= 2) && (pos[0] <= 7))) {
-      let n = locations.length;
-      for (let i = 0; i < n; i++) {
-        let st = checkBox(locations[i]);
-        var cell = document.getElementById("cell" + locations[i].toString());
-        if (st == 2) {
-          if (i == n - 1) {
-            pos[0] = row; pos[1] = col;
-            if (fromHome) document.getElementById(coin).style.backgroundColor = "green";
-            return;
-          }
-        }
-        else if (st == 1) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin1" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "red";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
+    if (updateBox(row, col, safety, pos, fromHome, 2, number)) players[2] = 0;
 
-        }
-        else if (st == 3) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin3" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "yellow";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
-
-        }
-        else if (st == 4) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin4" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "blue";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
-
-        }
-      }
-      console.log(pos[0].toString() + pos[1].toString())
-      var newId = getID(pos[0], pos[1]);
-      var oldId = getID(row, col);
-      var newCell = document.getElementById(newId);
-      var oldCell = document.getElementById(oldId);
-
-      newCell.style.backgroundColor = "green";
-      newCell.innerHTML = number;
-
-      if (!fromHome) {
-        oldCell.style.backgroundColor = "white";
-        oldCell.innerHTML = "";
-      }
-    }
-    else {
-      if (pos[0] == 7) {
-        if (col == 9) {
-          document.getElementById(getID(row, col)).style.backgroundColor = "white";
-          document.getElementById(getID(row, col)).innerHTML = "";
-        }
-        else {
-          let id = "way2" + row.toString();
-          document.getElementById(id).innerHTML = "";
-        }
-        document.getElementById(coin).style.backgroundColor = "lightgreen";
-        pos[0] = 0; pos[1] = 0; pos[3] = 1;
-      }
-      else {
-        if (!((col == 8) && (row >= 2))) {
-          document.getElementById(getID(row, col)).style.backgroundColor = "white";
-          document.getElementById(getID(row, col)).innerHTML = "";
-
-        }
-        else {
-          let id = "way2" + row.toString();
-          document.getElementById(id).innerHTML = "";
-        }
-        let newId = "way2" + pos[0].toString();
-        document.getElementById(newId).innerHTML = number;
-      }
-    }
-
-    players[2] = 0;
   }
 
   function play3(num, coin, pos) {
     let row = pos[0];
     let col = pos[1];
+    let safety = pos[2];
     let fromHome = false;
+    if ((pos[0] == 0) && (pos[1] == 0)) fromHome = true;
 
     let number = 0;
     if (coin == "coin31") number = 1;
@@ -610,106 +524,22 @@ function App() {
     else if (coin == "coin33") number = 3;
     else if (coin == "coin34") number = 4;
 
-    let locations = [];
 
-    if ((pos[0] == 0) && (pos[1] == 0)) {
-      if (num == 6) num = 1;
-      else return;
-      pos[0] = 9;
-      pos[1] = 14;
-      locations.push("914");
-      fromHome = true;
-      document.getElementById(coin).style.backgroundColor = "white";
-      num--;
-    }
+    move3(pos, num); //updates the new position
+    if ((pos[0] == 8) && (pos[1] == 9)) pos[3] = 1;
 
-    else locations = move3(pos, num);
+    //check for same coin meeting
 
-    if (!((pos[0] == 8) && (pos[1] <= 14) && (pos[1] >= 9))) {
-      var newId = getID(pos[0], pos[1]);
-      var oldId = getID(row, col);
-      var newCell = document.getElementById(newId);
-      var oldCell = document.getElementById(oldId);
+    if (updateBox(row, col, safety, pos, fromHome, 3, number)) players[3] = 0;
 
-      let n = locations.length;
-      for (let i = 0; i < n; i++) {
-        let st = checkBox(locations[i]);
-        var cell = document.getElementById("cell" + locations[i].toString());
-        if (st == 3) {
-          if (i == n - 1) {
-            pos[0] = row; pos[1] = col;
-            if (fromHome) document.getElementById(coin).style.backgroundColor = "yellow";
-            return;
-          }
-        }
-        else if (st == 2) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin2" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "green";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
-
-        }
-        else if (st == 1) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin1" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "red";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
-
-        }
-        else if (st == 4) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin4" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "blue";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
-        }
-      }
-
-      newCell.style.backgroundColor = "yellow";
-      newCell.innerHTML = number;
-
-      if (!fromHome) {
-        oldCell.style.backgroundColor = "white";
-        oldCell.innerHTML = "";
-      }
-    }
-    else {
-      if (pos[1] == 9) {
-        if (row == 9) {
-          document.getElementById(getID(row, col)).style.backgroundColor = "white";
-          document.getElementById(getID(row, col)).innerHTML = "";
-        }
-        else {
-          let id = "way3" + (16 - col).toString();
-          document.getElementById(id).innerHTML = "";
-        }
-        document.getElementById(coin).style.backgroundColor = "lightgreen";
-        pos[0] = 0; pos[1] = 0; pos[3] = 1;
-      }
-      else {
-        if (!((row == 8) && (col <= 14))) {
-          document.getElementById(getID(row, col)).style.backgroundColor = "white";
-          document.getElementById(getID(row, col)).innerHTML = "";
-
-        }
-        else {
-          let id = "way3" + (16 - col).toString();
-          document.getElementById(id).innerHTML = "";
-        }
-        let newId = "way3" + (16 - pos[1]).toString();
-        document.getElementById(newId).innerHTML = number;
-      }
-    }
-
-    players[3] = 0;
   }
 
   function play4(num, coin, pos) {
     let row = pos[0];
     let col = pos[1];
+    let safety = pos[2];
     let fromHome = false;
+    if ((pos[0] == 0) && (pos[1] == 0)) fromHome = true;
 
     let number = 0;
     if (coin == "coin41") number = 1;
@@ -717,100 +547,14 @@ function App() {
     else if (coin == "coin43") number = 3;
     else if (coin == "coin44") number = 4;
 
-    let locations = []
 
-    if ((pos[0] == 0) && (pos[1] == 0)) {
-      if (num == 6) num = 1;
-      else return;
-      pos[0] = 14;
-      pos[1] = 7;
-      locations.push("147");
-      fromHome = true;
-      document.getElementById(coin).style.backgroundColor = "white";
-      num--;
-    }
+    move4(pos, num); //updates the new position'
+    if ((pos[0] == 9) && (pos[1] == 8)) pos[3] = 1;
 
-    else locations = move4(pos, num);
+    //check for same coin meeting
 
-    if (!((pos[1] == 8) && (pos[0] <= 14) && (pos[0] >= 9))) {
-      var newId = getID(pos[0], pos[1]);
-      var oldId = getID(row, col);
-      var newCell = document.getElementById(newId);
-      var oldCell = document.getElementById(oldId);
+    if (updateBox(row, col, safety, pos, fromHome, 4, number)) players[4] = 0;
 
-      let n = locations.length;
-      for (let i = 0; i < n; i++) {
-        let st = checkBox(locations[i]);
-        var cell = document.getElementById("cell" + locations[i].toString());
-        if (st == 1) {
-          if (i == n - 1) {
-            pos[0] = row; pos[1] = col;
-            if (fromHome) document.getElementById(coin).style.backgroundColor = "blue";
-            return;
-          }
-        }
-        else if (st == 2) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin2" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "green";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
-
-        }
-        else if (st == 3) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin3" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "yellow";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
-
-        }
-        else if (st == 1) {
-          cell.style.backgroundColor = "white";
-          var coinId = "coin1" + cell.innerHTML.toString();
-          document.getElementById(coinId).style.backgroundColor = "red";
-          sendHome(st, cell.innerHTML.toString());
-          cell.innerHTML = "";
-        }
-      }
-
-      newCell.style.backgroundColor = "blue";
-      newCell.innerHTML = number;
-
-      if (!fromHome) {
-        oldCell.style.backgroundColor = "white";
-        oldCell.innerHTML = "";
-      }
-    }
-    else {
-      if (pos[0] == 9) {
-        if (col == 7) {
-          document.getElementById(getID(row, col)).style.backgroundColor = "white";
-          document.getElementById(getID(row, col)).innerHTML = "";
-        }
-        else {
-          let id = "way4" + (16 - row).toString();
-          document.getElementById(id).innerHTML = "";
-        }
-        document.getElementById(coin).style.backgroundColor = "lightgreen";
-        pos[0] = 0; pos[1] = 0; pos[3] = 1;
-      }
-      else {
-        if (!((col == 8) && (row <= 14))) {
-          document.getElementById(getID(row, col)).style.backgroundColor = "white";
-          document.getElementById(getID(row, col)).innerHTML = "";
-
-        }
-        else {
-          let id = "way4" + (16 - row).toString();
-          document.getElementById(id).innerHTML = "";
-        }
-        let newId = "way4" + (16 - pos[0]).toString();
-        document.getElementById(newId).innerHTML = number;
-      }
-    }
-
-    players[4] = 0;
   }
 
 
@@ -851,8 +595,13 @@ function App() {
   function start() {
     player = 4;
     players[player] = 1;
+    document.getElementById("cell72").innerHTML = "START";
+    document.getElementById("cell29").innerHTML = "START";
+    document.getElementById("cell914").innerHTML = "START";
+    document.getElementById("cell147").innerHTML = "START";
     document.getElementById('rollbutton').onclick = function () { rolldice() };
   }
+
 
   const [currentAccount, setCurrentAccount] = useState("");
   const [userCoins, setUserCoins] = useState(0);
@@ -904,31 +653,57 @@ function App() {
       player43pos = p43pos;
       player44pos = p44pos;
 
-      var c = document.getElementById("coin11");
-      c.style.gridRowStart = player11pos[0];
-      c.style.gridRowEnd = player11pos[0] + 1;
-      c.style.gridColumnStart = player11pos[1];
-      c.style.gridColumnEnd = player11pos[1] + 1;
+      // var c = document.getElementById("coin11");
+      // c.style.gridRowStart = player11pos[0];
+      // c.style.gridRowEnd = player11pos[0] + 1;
+      // c.style.gridColumnStart = player11pos[1];
+      // c.style.gridColumnEnd = player11pos[1] + 1;
 
-      var c = document.getElementById("coin12");
-      c.style.gridRowStart = player12pos[0];
-      c.style.gridRowEnd = player12pos[0] + 1;
-      c.style.gridColumnStart = player12pos[1];
-      c.style.gridColumnEnd = player12pos[1] + 1;
+      // var c = document.getElementById("coin12");
+      // c.style.gridRowStart = player12pos[0];
+      // c.style.gridRowEnd = player12pos[0] + 1;
+      // c.style.gridColumnStart = player12pos[1];
+      // c.style.gridColumnEnd = player12pos[1] + 1;
 
-      var c = document.getElementById("coin13");
-      c.style.gridRowStart = player13pos[0];
-      c.style.gridRowEnd = player13pos[0] + 1;
-      c.style.gridColumnStart = player13pos[1];
-      c.style.gridColumnEnd = player13pos[1] + 1;
+      // var c = document.getElementById("coin13");
+      // c.style.gridRowStart = player13pos[0];
+      // c.style.gridRowEnd = player13pos[0] + 1;
+      // c.style.gridColumnStart = player13pos[1];
+      // c.style.gridColumnEnd = player13pos[1] + 1;
 
-      var c = document.getElementById("coin14");
-      c.style.gridRowStart = player14pos[0];
-      c.style.gridRowEnd = player14pos[0] + 1;
-      c.style.gridColumnStart = player14pos[1];
-      c.style.gridColumnEnd = player14pos[1] + 1;
+      // var c = document.getElementById("coin14");
+      // c.style.gridRowStart = player14pos[0];
+      // c.style.gridRowEnd = player14pos[0] + 1;
+      // c.style.gridColumnStart = player14pos[1];
+      // c.style.gridColumnEnd = player14pos[1] + 1;
 
     });
+
+    socket.on("s_fromHome", (id, color, coin, colour) => {
+      document.getElementById(id).style.backgroundColor = colour;
+      document.getElementById(id).innerHTML = coin;
+      document.getElementById("coin" + color.toString() + coin.toString()).style.backgroundColor = "white";
+    })
+
+    socket.on("s_setNull", (row, col) => {
+      document.getElementById(getID(row, col)).style.backgroundColor = "";
+      document.getElementById(getID(row, col)).innerHTML = "";
+    })
+
+    socket.on("s_pos2", (pos_0, pos_1, colour, coin) => {
+      document.getElementById(getID(pos_0, pos_1)).style.backgroundColor = colour;
+      document.getElementById(getID(pos_0, pos_1)).innerHTML = coin;
+    })
+
+    socket.on("s_pos3", (coinId) => {
+      document.getElementById(coinId).style.backgroundColor = "lightgreen";
+    })
+
+    socket.on("s_Notpos3", (pos_0, pos_1, colour, coin) => {
+      document.getElementById(getID(pos_0, pos_1)).style.backgroundColor = colour;
+      document.getElementById(getID(pos_0, pos_1)).innerHTML = coin;
+    })
+
   }, [socket])
 
 
