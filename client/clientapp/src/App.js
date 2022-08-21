@@ -587,9 +587,11 @@ function App() {
     var choice = document.getElementById("choice");
     let num = getRandomInt(6);
     choice.style.backgroundImage = `url(${dice[num]})`;
+    console.log(dice[num]);
     num = num + 1;
 
     play(num);
+    socket.emit("updatePlayers", (players, room));
   }
 
   function start() {
@@ -652,38 +654,16 @@ function App() {
       player42pos = p42pos;
       player43pos = p43pos;
       player44pos = p44pos;
-
-      // var c = document.getElementById("coin11");
-      // c.style.gridRowStart = player11pos[0];
-      // c.style.gridRowEnd = player11pos[0] + 1;
-      // c.style.gridColumnStart = player11pos[1];
-      // c.style.gridColumnEnd = player11pos[1] + 1;
-
-      // var c = document.getElementById("coin12");
-      // c.style.gridRowStart = player12pos[0];
-      // c.style.gridRowEnd = player12pos[0] + 1;
-      // c.style.gridColumnStart = player12pos[1];
-      // c.style.gridColumnEnd = player12pos[1] + 1;
-
-      // var c = document.getElementById("coin13");
-      // c.style.gridRowStart = player13pos[0];
-      // c.style.gridRowEnd = player13pos[0] + 1;
-      // c.style.gridColumnStart = player13pos[1];
-      // c.style.gridColumnEnd = player13pos[1] + 1;
-
-      // var c = document.getElementById("coin14");
-      // c.style.gridRowStart = player14pos[0];
-      // c.style.gridRowEnd = player14pos[0] + 1;
-      // c.style.gridColumnStart = player14pos[1];
-      // c.style.gridColumnEnd = player14pos[1] + 1;
-
     });
 
-    socket.on("s_fromHome", (id, color, coin, colour) => {
+    console.log("here1");
+    socket.on("sfromHome", (id, color, coin, colour) => {
+      console.log("event catched..")
       document.getElementById(id).style.backgroundColor = colour;
       document.getElementById(id).innerHTML = coin;
       document.getElementById("coin" + color.toString() + coin.toString()).style.backgroundColor = "white";
     })
+    console.log("here2");
 
     socket.on("s_setNull", (row, col) => {
       document.getElementById(getID(row, col)).style.backgroundColor = "";
@@ -704,8 +684,18 @@ function App() {
       document.getElementById(getID(pos_0, pos_1)).innerHTML = coin;
     })
 
+    socket.on("s_updatePlayers", (Players) => {
+      players = Players;
+    })
+
   }, [socket])
 
+  socket.on("sfromHome", (id, color, coin, colour) => {
+    console.log("event catched..")
+    document.getElementById(id).style.backgroundColor = colour;
+    document.getElementById(id).innerHTML = coin;
+    document.getElementById("coin" + color.toString() + coin.toString()).style.backgroundColor = "white";
+  })
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -795,12 +785,7 @@ function App() {
 
         //add condition: players should not be more than 4 in any room
         socket.emit("join_room", room);
-        socket.on("join_error", () => {
-            setroomJoined(false);
-        });
-        socket.on("join_success", () => {
-          setroomJoined(true);
-        });
+        setroomJoined(true);
 
       } else {
         console.log("Ethereum object doesn't exist!")
@@ -819,23 +804,14 @@ function App() {
       }
     })
   }
+
+  const buyToken = () => {
+    window.open("https://app.uniswap.org/#/swap?chain=polygon_mumbai", '_blank');
+  }
   const updateCoins = () => {
 
   }
-  // if (board) {
-  //   return (
-  //     <div>
-  //       <h3>Enter room code</h3>
-  //       <input placeholder="Room Number..." onChange={(event) => {
-  //         setRoom(event.target.value);
-  //       }}
-  //       />
-  //       <button className="joinButton" onClick={joinRoom}>Join room</button>
-  //       {console.log(roomJoined)}
-  //     </div>
-
-  //   )
-  // }
+  
   if (roomJoined) {
     return (
       <div>
@@ -961,11 +937,16 @@ function App() {
       <div className="nav">
         <h3>{currentAccount}</h3>
         <h3>{userCoins}</h3>
+        <button className="buyTokens" onClick={buyToken}>
+            Buy Tokens
+          </button>
+          
       </div>
       <div className="boards">
         <div className="style-board">
           <form className="form-board">
             <button className="buttonApp" onClick={connectWallet}>Connect Wallet</button>
+
 
             <label htmlFor="players" className="players">Select
               players</label>
