@@ -615,7 +615,7 @@ function App() {
       players: 2,
       coins: 50
     });
-  const contractAddress = "0xD99EfEa12e6453AB13B6FA861250020cAA2c21E9";
+  const contractAddress = "0x12dcaa759f5bc7559dcbf3d7bf2164e950856ecb";
   const contractABI = abi.abi;
 
   const joinRoom = () => {
