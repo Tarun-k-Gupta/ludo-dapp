@@ -607,7 +607,6 @@ function App() {
 
   const [currentAccount, setCurrentAccount] = useState("");
   const [userCoins, setUserCoins] = useState(0);
-  // const [board, setBoard] = useState(false);
   const [room, setRoom] = useState("");
   const [roomJoined, setroomJoined] = useState(false);
   const [gameStartData, setGameStartData] = useState(
@@ -615,7 +614,7 @@ function App() {
       players: 2,
       coins: 50
     });
-  const contractAddress = "0x12dcaa759f5bc7559dcbf3d7bf2164e950856ecb";
+  const contractAddress = "0xB5600aa28a8B2F5e008C2e8f13Bb8c5C2698D625";
   const contractABI = abi.abi;
 
   const joinRoom = () => {
@@ -697,35 +696,6 @@ function App() {
     document.getElementById("coin" + color.toString() + coin.toString()).style.backgroundColor = "white";
   })
 
-  const checkIfWalletIsConnected = async () => {
-    try {
-      const { ethereum } = window;
-
-      if (!ethereum) {
-        console.log("Make sure you have metamask!");
-        return;
-      } else {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
-
-        console.log("We have the ethereum object", ethereum);
-      }
-
-      const accounts = await ethereum.request({ method: "eth_accounts" });
-
-      if (accounts.length !== 0) {
-        const account = accounts[0];
-        console.log("Found an authorized account:", account);
-        setCurrentAccount(account);
-      } else {
-        console.log("No authorized account found")
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   const connectWallet = async (e) => {
     try {
       e.preventDefault();
@@ -744,8 +714,8 @@ function App() {
       const provider = new ethers.providers.Web3Provider(ethereum);
       const signer = provider.getSigner();
       const ludoContract = new ethers.Contract(contractAddress, contractABI, signer);
-      await ludoContract.signUp();
-      let userCoins = await ludoContract.getBalance("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
+      await ludoContract.newAccount(accounts[0]);
+      let userCoins = await ludoContract.getBalance(accounts[0]);
       setUserCoins(userCoins.toNumber());
       console.log("coins:", userCoins.toNumber());
     } catch (error) {
@@ -778,10 +748,10 @@ function App() {
           return;
         };
 
-        // let staked = await ludoContract.startGame("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", gameStartData.coins);
-        // let userCoins = await ludoContract.getBalance("0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2");
-        // setUserCoins(userCoins.toNumber());
-        // console.log("coins:", userCoins.toNumber());
+        let staked = await ludoContract.startGame(currentAccount, gameStartData.coins);
+        let userCoins = await ludoContract.getBalance(currentAccount);
+        setUserCoins(userCoins.toNumber());
+        console.log("coins:", userCoins.toNumber());
 
         //add condition: players should not be more than 4 in any room
         socket.emit("join_room", room);
