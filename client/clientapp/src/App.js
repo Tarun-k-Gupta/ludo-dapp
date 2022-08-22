@@ -5,10 +5,18 @@ import "./board.css";
 import "./App.css";
 import io from "socket.io-client";
 import abi from "./ludoAbi/Ludo.json";
+import logo1 from './one.jpeg';
+import logo2 from './two.jpeg';
+import logo3 from './three.jpeg';
+import logo4 from './four.jpeg';
+import logo5 from './five.jpeg';
+import logo6 from './six.jpeg';
+
 const socket = io.connect("http://localhost:3001");
 
 function App() {
   const [diceUrl, setDiceUrl] = useState("")
+  const [displayNo, setdisplayNo] = useState()
 
   let dice = ['./one.jpeg', './two.jpeg', './three.jpeg', './four.jpeg', './five.jpeg', './six.jpeg']
 
@@ -586,7 +594,28 @@ function App() {
   function rolldice() {
     var choice = document.getElementById("choice");
     let num = getRandomInt(6);
-    choice.style.backgroundImage = `url(${dice[num]})`;
+    setdisplayNo(num+1);
+    // switch(num) {
+      // case 1:
+      //   choice.src = {logo1};
+      //   break;
+      // case 2:
+      //   choice.src = {logo2};
+      //   break;
+      // case 3:
+      //   choice.src = {logo3};
+      //   break;
+      // case 4:
+      //   choice.src = {logo4};
+      //   break;
+      // case 5:
+      //   choice.src = {logo5};
+      //   break;
+      // case 6:
+      //   choice.src = {logo6};
+      //   break; 
+    // }
+
     console.log(dice[num]);
     num = num + 1;
 
@@ -886,7 +915,7 @@ function App() {
 
           </section>
 
-          <img src="ludo.png" class="choice" id="choice"></img>
+          <h3 class="choice" id="choice">{displayNo}</h3>
 
           <button class="rollbutton" id="rollbutton">
             Roll
